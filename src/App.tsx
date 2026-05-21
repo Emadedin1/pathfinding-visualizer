@@ -237,41 +237,44 @@ const App: React.FC = () => {
     [gridState, isVisualizing]
   );
 
-  // Generate maze
-  const generateMaze = useCallback(() => {
-    if (isVisualizing) return;
+  // Generate maze for the selected maze type
+  const generateMaze = useCallback(
+    (mazeType: MazeName) => {
+      if (isVisualizing) return;
 
-    let walls: Position[] = [];
+      let walls: Position[] = [];
 
-    switch (selectedMaze) {
-      case 'recursive-division':
-        walls = recursiveDivisionMaze(gridState.length, gridState[0].length, startPos, targetPos);
-        break;
-      case 'random-walls':
-        walls = randomWallsMaze(gridState.length, gridState[0].length, startPos, targetPos, 0.25);
-        break;
-      case 'random-weights':
-        walls = randomWeightsMaze(gridState.length, gridState[0].length, startPos, targetPos, 0.20);
-        break;
-      case 'stairs':
-        walls = stairsPattern(gridState.length, gridState[0].length, startPos, targetPos);
-        break;
-    }
-
-    const newGrid = clearVisualization(clearWallsAndWeights(gridState));
-
-    for (const pos of walls) {
-      if (selectedMaze === 'random-weights') {
-        setNodeType(newGrid, pos, 'weight');
-        setNodeWeight(newGrid, pos, 5);
-      } else {
-        setNodeType(newGrid, pos, 'wall');
+      switch (mazeType) {
+        case 'recursive-division':
+          walls = recursiveDivisionMaze(gridState.length, gridState[0].length, startPos, targetPos);
+          break;
+        case 'random-walls':
+          walls = randomWallsMaze(gridState.length, gridState[0].length, startPos, targetPos, 0.25);
+          break;
+        case 'random-weights':
+          walls = randomWeightsMaze(gridState.length, gridState[0].length, startPos, targetPos, 0.20);
+          break;
+        case 'stairs':
+          walls = stairsPattern(gridState.length, gridState[0].length, startPos, targetPos);
+          break;
       }
-    }
 
-    setGridState(newGrid);
-    setResult(null);
-  }, [gridState, startPos, targetPos, selectedMaze, isVisualizing]);
+      const newGrid = clearVisualization(clearWallsAndWeights(gridState));
+
+      for (const pos of walls) {
+        if (mazeType === 'random-weights') {
+          setNodeType(newGrid, pos, 'weight');
+          setNodeWeight(newGrid, pos, 5);
+        } else {
+          setNodeType(newGrid, pos, 'wall');
+        }
+      }
+
+      setGridState(newGrid);
+      setResult(null);
+    },
+    [gridState, startPos, targetPos, isVisualizing]
+  );
 
   // Clear path
   const handleClearPath = useCallback(() => {
@@ -352,8 +355,8 @@ const App: React.FC = () => {
             selectedMaze={selectedMaze}
             onMazeChange={(maze) => {
               setSelectedMaze(maze);
-              // Auto-generate maze when selected
-              setTimeout(() => generateMaze(), 50);
+              // Auto-generate maze when selected using the new option directly
+              setTimeout(() => generateMaze(maze), 50);
             }}
             onVisualize={runVisualization}
             onClearPath={handleClearPath}
