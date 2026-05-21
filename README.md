@@ -3,7 +3,7 @@
 An interactive pathfinding visualizer built with React, TypeScript, and Vite.  
 The app demonstrates how different pathfinding algorithms explore a grid and find paths in real time.
 
-LIVE DEMO: https://pathfinding-visualizer-q2bdsnnb0-emadedin1s-projects.vercel.app/
+Access it here: https://pathfinding-visualizer-q2bdsnnb0-emadedin1s-projects.vercel.app/
 
 ## Features
 
