@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { AlgorithmName, MazeName, AnimationSpeed } from '../../algorithms/types';
+import type { AlgorithmName, MazeName } from '../../algorithms/types';
 import './Controls.css';
 
 interface ControlsProps {
@@ -8,9 +8,6 @@ interface ControlsProps {
   
   selectedMaze: MazeName;
   onMazeChange: (maze: MazeName) => void;
-  
-  animationSpeed: AnimationSpeed;
-  onSpeedChange: (speed: AnimationSpeed) => void;
   
   onVisualize: () => void;
   onClearPath: () => void;
@@ -29,8 +26,6 @@ const Controls: React.FC<ControlsProps> = ({
   onAlgorithmChange,
   selectedMaze,
   onMazeChange,
-  animationSpeed,
-  onSpeedChange,
   onVisualize,
   onClearPath,
   onClearBoard,
@@ -106,33 +101,6 @@ const Controls: React.FC<ControlsProps> = ({
         )}
       </div>
 
-      {/* Speed Section */}
-      <div className="control-section">
-        <button
-          className="section-header"
-          onClick={() => toggleSection('speed')}
-        >
-          <span>⚡ Speed</span>
-          <span>{expandedSection === 'speed' ? '▼' : '▶'}</span>
-        </button>
-        {expandedSection === 'speed' && (
-          <div className="section-content">
-            <div className="button-group">
-              {(['slow', 'normal', 'fast', 'instant'] as const).map((speed) => (
-                <button
-                  key={speed}
-                  className={`speed-button ${animationSpeed === speed ? 'active' : ''}`}
-                  onClick={() => onSpeedChange(speed)}
-                  disabled={isVisualizing}
-                  title={getSpeedLabel(speed)}
-                >
-                  {getSpeedLabel(speed)}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Tools Section */}
       <div className="control-section">
@@ -226,14 +194,5 @@ const getAlgorithmDescription = (algo: AlgorithmName): string => {
   return descriptions[algo] || '';
 };
 
-const getSpeedLabel = (speed: AnimationSpeed): string => {
-  const labels: Record<AnimationSpeed, string> = {
-    slow: 'Slow',
-    normal: 'Normal',
-    fast: 'Fast',
-    instant: 'Instant',
-  };
-  return labels[speed] || '';
-};
 
 export default Controls;

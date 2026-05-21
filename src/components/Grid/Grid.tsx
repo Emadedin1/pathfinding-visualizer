@@ -6,7 +6,7 @@ import './Grid.css';
 interface GridProps {
   grid: GridNodeType[][];
   onNodeMouseDown: (pos: Position, button: number) => void;
-  onNodeMouseEnter: (pos: Position) => void;
+  onNodeMouseEnter: (pos: Position, button: number | null) => void;
   onNodeMouseUp: () => void;
   onNodeContextMenu: (e: React.MouseEvent, pos: Position) => void;
   isVisualizing: boolean;
@@ -21,11 +21,13 @@ const Grid: React.FC<GridProps> = ({
   isVisualizing,
 }) => {
   const [isMouseDown, setIsMouseDown] = useState(false);
+  const [mouseButton, setMouseButton] = useState<number | null>(null);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent, pos: Position) => {
       if (!isVisualizing) {
         setIsMouseDown(true);
+        setMouseButton(e.button);
         onNodeMouseDown(pos, e.button);
       }
     },
@@ -35,14 +37,15 @@ const Grid: React.FC<GridProps> = ({
   const handleMouseEnter = useCallback(
     (pos: Position) => {
       if (isMouseDown && !isVisualizing) {
-        onNodeMouseEnter(pos);
+        onNodeMouseEnter(pos, mouseButton);
       }
     },
-    [onNodeMouseEnter, isMouseDown, isVisualizing]
+    [isMouseDown, mouseButton, onNodeMouseEnter, isVisualizing]
   );
 
   const handleMouseUp = useCallback(() => {
     setIsMouseDown(false);
+    setMouseButton(null);
     onNodeMouseUp();
   }, [onNodeMouseUp]);
 
@@ -51,6 +54,7 @@ const Grid: React.FC<GridProps> = ({
       className="grid-container"
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onContextMenu={(e) => e.preventDefault()}
       style={{
         gridTemplateColumns: `repeat(${grid[0].length}, 24px)`,
         gridAutoRows: '24px',
@@ -58,21 +62,14 @@ const Grid: React.FC<GridProps> = ({
     >
       {grid.map((row) =>
         row.map((node) => (
-          <div
+          <GridNode
             key={`${node.position.row}-${node.position.col}`}
-            onMouseDown={(e) => handleMouseDown(e, node.position)}
-            onMouseEnter={() => handleMouseEnter(node.position)}
+            node={node}
+            onMouseDown={handleMouseDown}
+            onMouseEnter={handleMouseEnter}
+            onMouseUp={handleMouseUp}
             onContextMenu={(e) => onNodeContextMenu(e, node.position)}
-            style={{ width: '100%', height: '100%' }}
-          >
-            <GridNode
-              node={node}
-              onMouseDown={() => {}}
-              onMouseEnter={() => {}}
-              onMouseUp={handleMouseUp}
-              onContextMenu={(e) => onNodeContextMenu(e, node.position)}
-            />
-          </div>
+          />
         ))
       )}
     </div>

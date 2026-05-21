@@ -4,7 +4,6 @@ import type {
   Position,
   AlgorithmName,
   MazeName,
-  AnimationSpeed,
   AlgorithmResult,
 } from './algorithms/types';
 import Grid from './components/Grid/Grid';
@@ -59,7 +58,6 @@ const App: React.FC = () => {
 
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<AlgorithmName>('dijkstra');
   const [selectedMaze, setSelectedMaze] = useState<MazeName>('recursive-division');
-  const [animationSpeed, setAnimationSpeed] = useState<AnimationSpeed>('normal');
   const [toolMode, setToolMode] = useState<'wall' | 'weight'>('wall');
   const [isVisualizing, setIsVisualizing] = useState(false);
   const [result, setResult] = useState<AlgorithmResult | null>(null);
@@ -98,7 +96,7 @@ const App: React.FC = () => {
         algorithmResult = dijkstra(gridForAlgo, startPos, targetPos);
     }
 
-    const delay = getAnimationDelay(animationSpeed);
+    const delay = getAnimationDelay('normal');
 
     // Visualize visited nodes
     let visualGrid = cloneGrid(gridState);
@@ -127,7 +125,7 @@ const App: React.FC = () => {
 
     setResult(algorithmResult);
     setIsVisualizing(false);
-  }, [gridState, startPos, targetPos, selectedAlgorithm, animationSpeed]);
+  }, [gridState, startPos, targetPos, selectedAlgorithm]);
 
   // Stop visualization
   const stopVisualization = useCallback(() => {
@@ -145,11 +143,11 @@ const App: React.FC = () => {
       const node = gridState[pos.row][pos.col];
 
       if (button === 2) {
-        // Right-click: weight mode
-        if (node.type === 'empty') {
+        // Right-click: erase wall or weight
+        if (node.type === 'wall' || node.type === 'weight') {
           const newGrid = cloneGrid(gridState);
-          setNodeType(newGrid, pos, 'weight');
-          setNodeWeight(newGrid, pos, 5);
+          setNodeType(newGrid, pos, 'empty');
+          setNodeWeight(newGrid, pos, 1);
           setGridState(newGrid);
         }
       } else if (button === 0) {
@@ -175,28 +173,46 @@ const App: React.FC = () => {
 
   // Handle node mouse enter (for dragging)
   const handleNodeMouseEnter = useCallback(
-    (pos: Position) => {
-      if (!draggingNode || isVisualizing) return;
+    (pos: Position, button: number | null) => {
+      if (isVisualizing) return;
 
+      const node = gridState[pos.row][pos.col];
       const newGrid = cloneGrid(gridState);
 
       if (draggingNode === 'start') {
-        // Remove old start
         setNodeType(newGrid, startPos, 'empty');
-        // Add new start
         setNodeType(newGrid, pos, 'start');
         setStartPos(pos);
         setGridState(newGrid);
-      } else if (draggingNode === 'target') {
-        // Remove old target
+        return;
+      }
+
+      if (draggingNode === 'target') {
         setNodeType(newGrid, targetPos, 'empty');
-        // Add new target
         setNodeType(newGrid, pos, 'target');
         setTargetPos(pos);
         setGridState(newGrid);
+        return;
+      }
+
+      if (button === 0) {
+        if (toolMode === 'wall' && node.type === 'empty') {
+          setNodeType(newGrid, pos, 'wall');
+          setGridState(newGrid);
+        } else if (toolMode === 'weight' && node.type === 'empty') {
+          setNodeType(newGrid, pos, 'weight');
+          setNodeWeight(newGrid, pos, 5);
+          setGridState(newGrid);
+        }
+      } else if (button === 2) {
+        if (node.type === 'wall' || node.type === 'weight') {
+          setNodeType(newGrid, pos, 'empty');
+          setNodeWeight(newGrid, pos, 1);
+          setGridState(newGrid);
+        }
       }
     },
-    [draggingNode, startPos, targetPos, gridState, isVisualizing]
+    [draggingNode, startPos, targetPos, gridState, toolMode, isVisualizing]
   );
 
   // Handle mouse up
@@ -211,7 +227,7 @@ const App: React.FC = () => {
       if (isVisualizing) return;
 
       const node = gridState[pos.row][pos.col];
-      if (node.type === 'weight') {
+      if (node.type === 'wall' || node.type === 'weight') {
         const newGrid = cloneGrid(gridState);
         setNodeType(newGrid, pos, 'empty');
         setNodeWeight(newGrid, pos, 1);
@@ -235,14 +251,14 @@ const App: React.FC = () => {
         walls = randomWallsMaze(gridState.length, gridState[0].length, startPos, targetPos, 0.25);
         break;
       case 'random-weights':
-        walls = randomWeightsMaze(gridState.length, gridState[0].length, startPos, targetPos, 0.15);
+        walls = randomWeightsMaze(gridState.length, gridState[0].length, startPos, targetPos, 0.20);
         break;
       case 'stairs':
         walls = stairsPattern(gridState.length, gridState[0].length, startPos, targetPos);
         break;
     }
 
-    const newGrid = clearWallsAndWeights(gridState);
+    const newGrid = clearVisualization(clearWallsAndWeights(gridState));
 
     for (const pos of walls) {
       if (selectedMaze === 'random-weights') {
@@ -339,8 +355,6 @@ const App: React.FC = () => {
               // Auto-generate maze when selected
               setTimeout(() => generateMaze(), 50);
             }}
-            animationSpeed={animationSpeed}
-            onSpeedChange={setAnimationSpeed}
             onVisualize={runVisualization}
             onClearPath={handleClearPath}
             onClearBoard={handleClearBoard}

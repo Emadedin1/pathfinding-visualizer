@@ -26,8 +26,8 @@ const Legend: React.FC = () => {
       <div className="legend-instructions">
         <h4>How to use:</h4>
         <ul>
-          <li><strong>Click</strong> to draw walls</li>
-          <li><strong>Right-click</strong> to draw weights</li>
+          <li><strong>Click</strong> to draw walls or weights</li>
+          <li><strong>Right-click</strong> to erase walls or weights</li>
           <li><strong>Drag</strong> start/target to move them</li>
           <li>Generate a maze or customize your board</li>
           <li>Select algorithm and click Visualize</li>

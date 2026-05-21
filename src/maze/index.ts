@@ -1,7 +1,22 @@
 import type { Position } from '../algorithms/types';
 
-// Recursive Division Maze Generation
-// Divides the grid recursively and creates passages
+const isStartOrTarget = (pos: Position, start: Position, target: Position): boolean => {
+  return (
+    (pos.row === start.row && pos.col === start.col) ||
+    (pos.row === target.row && pos.col === target.col)
+  );
+};
+
+const chooseOrientation = (
+  width: number,
+  height: number,
+  preferHorizontal: boolean
+): boolean => {
+  if (width < height) return true;
+  if (height < width) return false;
+  return preferHorizontal;
+};
+
 export const recursiveDivisionMaze = (
   rows: number,
   cols: number,
@@ -10,7 +25,6 @@ export const recursiveDivisionMaze = (
 ): Position[] => {
   const walls: Position[] = [];
 
-  // Start with empty grid, recursively add walls
   const divide = (
     rowStart: number,
     rowEnd: number,
@@ -18,68 +32,63 @@ export const recursiveDivisionMaze = (
     colEnd: number,
     horizontal: boolean
   ) => {
-    if (rowEnd - rowStart < 2 || colEnd - colStart < 2) {
+    const height = rowEnd - rowStart;
+    const width = colEnd - colStart;
+
+    if (height < 3 || width < 3) {
       return;
     }
 
-    if (horizontal) {
-      // Create horizontal wall
-      const row = rowStart + Math.floor(Math.random() * (rowEnd - rowStart - 1));
-      const passageCol =
-        colStart + Math.floor(Math.random() * (colEnd - colStart));
+    const splitHorizontal = chooseOrientation(width, height, horizontal);
 
-      for (let c = colStart; c < colEnd; c++) {
-        if (c !== passageCol) {
-          const pos = { row, col: c };
-          if (!isStartOrTarget(pos, start, target)) {
-            walls.push(pos);
-          }
+    if (splitHorizontal) {
+      const wallRow = rowStart + Math.floor(Math.random() * (height - 2)) + 1;
+      const passageCol = colStart + Math.floor(Math.random() * (width - 2)) + 1;
+
+      for (let col = colStart; col < colEnd; col++) {
+        if (col === passageCol) continue;
+        const pos = { row: wallRow, col };
+        if (!isStartOrTarget(pos, start, target)) {
+          walls.push(pos);
         }
       }
 
-      divide(rowStart, row, colStart, colEnd, false);
-      divide(row + 1, rowEnd, colStart, colEnd, false);
+      divide(rowStart, wallRow, colStart, colEnd, false);
+      divide(wallRow + 1, rowEnd, colStart, colEnd, false);
     } else {
-      // Create vertical wall
-      const col = colStart + Math.floor(Math.random() * (colEnd - colStart - 1));
-      const passageRow =
-        rowStart + Math.floor(Math.random() * (rowEnd - rowStart));
+      const wallCol = colStart + Math.floor(Math.random() * (width - 2)) + 1;
+      const passageRow = rowStart + Math.floor(Math.random() * (height - 2)) + 1;
 
-      for (let r = rowStart; r < rowEnd; r++) {
-        if (r !== passageRow) {
-          const pos = { row: r, col };
-          if (!isStartOrTarget(pos, start, target)) {
-            walls.push(pos);
-          }
+      for (let row = rowStart; row < rowEnd; row++) {
+        if (row === passageRow) continue;
+        const pos = { row, col: wallCol };
+        if (!isStartOrTarget(pos, start, target)) {
+          walls.push(pos);
         }
       }
 
-      divide(rowStart, rowEnd, colStart, col, true);
-      divide(rowStart, rowEnd, col + 1, colEnd, true);
+      divide(rowStart, rowEnd, colStart, wallCol, true);
+      divide(rowStart, rowEnd, wallCol + 1, colEnd, true);
     }
   };
 
-  divide(0, rows, 0, cols, Math.random() > 0.5);
+  divide(0, rows, 0, cols, rows <= cols);
   return walls;
 };
 
-// Random Walls Maze Generation
 export const randomWallsMaze = (
   rows: number,
   cols: number,
   start: Position,
   target: Position,
-  density: number = 0.3
+  density: number = 0.25
 ): Position[] => {
   const walls: Position[] = [];
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const pos = { row: r, col: c };
-      if (
-        !isStartOrTarget(pos, start, target) &&
-        Math.random() < density
-      ) {
+      if (!isStartOrTarget(pos, start, target) && Math.random() < density) {
         walls.push(pos);
       }
     }
@@ -88,23 +97,19 @@ export const randomWallsMaze = (
   return walls;
 };
 
-// Random Weights
 export const randomWeightsMaze = (
   rows: number,
   cols: number,
   start: Position,
   target: Position,
-  density: number = 0.1
+  density: number = 0.20
 ): Position[] => {
   const weights: Position[] = [];
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const pos = { row: r, col: c };
-      if (
-        !isStartOrTarget(pos, start, target) &&
-        Math.random() < density
-      ) {
+      if (!isStartOrTarget(pos, start, target) && Math.random() < density) {
         weights.push(pos);
       }
     }
@@ -113,7 +118,6 @@ export const randomWeightsMaze = (
   return weights;
 };
 
-// Stair Pattern
 export const stairsPattern = (
   rows: number,
   cols: number,
@@ -121,37 +125,32 @@ export const stairsPattern = (
   target: Position
 ): Position[] => {
   const walls: Position[] = [];
-  const stepSize = 3;
+  const stepHeight = Math.max(2, Math.floor(rows / 10));
+  const stepWidth = Math.max(4, Math.floor(cols / 12));
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const pos = { row: r, col: c };
-      if (isStartOrTarget(pos, start, target)) continue;
+  let row = 2;
+  let col = 2;
 
-      // Create stair pattern
-      const stairRow = Math.floor(r / stepSize);
-      const stairCol = Math.floor(c / stepSize);
-
-      // Draw stairs diagonally
-      if (stairRow === stairCol) {
-        const offset = r % stepSize;
-        const colOffset = c % stepSize;
-
-        // Create stair blocks
-        if (colOffset < offset) {
-          walls.push(pos);
-        }
+  while (row < rows - 1 && col < cols - 1) {
+    const endCol = Math.min(col + stepWidth, cols - 2);
+    for (let c = col; c <= endCol; c++) {
+      const pos = { row, col: c };
+      if (!isStartOrTarget(pos, start, target)) {
+        walls.push(pos);
       }
     }
+
+    const endRow = Math.min(row + stepHeight, rows - 2);
+    for (let r = row; r <= endRow; r++) {
+      const pos = { row: r, col: endCol };
+      if (!isStartOrTarget(pos, start, target)) {
+        walls.push(pos);
+      }
+    }
+
+    row += stepHeight + 1;
+    col += stepWidth + 1;
   }
 
   return walls;
-};
-
-// Helper function to check if position is start or target
-const isStartOrTarget = (pos: Position, start: Position, target: Position): boolean => {
-  return (
-    (pos.row === start.row && pos.col === start.col) ||
-    (pos.row === target.row && pos.col === target.col)
-  );
 };

@@ -116,7 +116,6 @@
   grid-template-columns: 1fr;
 }
 
-.speed-button,
 .tool-button {
   padding: 10px 12px;
   border: 1px solid #d1d5db;
@@ -129,20 +128,17 @@
   transition: all 0.2s ease;
 }
 
-.speed-button:hover:not(:disabled),
 .tool-button:hover:not(:disabled) {
   border-color: #9ca3af;
   background-color: #f9fafb;
 }
 
-.speed-button.active,
 .tool-button.active {
   background-color: #3b82f6;
   border-color: #3b82f6;
   color: white;
 }
 
-.speed-button:disabled,
 .tool-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;

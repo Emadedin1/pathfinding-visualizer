@@ -4,7 +4,7 @@ import './Grid.css';
 
 interface GridNodeProps {
   node: GridNodeType;
-  onMouseDown: (pos: Position) => void;
+  onMouseDown: (e: React.MouseEvent, pos: Position) => void;
   onMouseEnter: (pos: Position) => void;
   onMouseUp: () => void;
   onContextMenu: (e: React.MouseEvent, pos: Position) => void;
@@ -44,7 +44,7 @@ const GridNode: React.FC<GridNodeProps> = memo(
     return (
       <div
         className={getNodeClass()}
-        onMouseDown={() => onMouseDown(node.position)}
+        onMouseDown={(e) => onMouseDown(e, node.position)}
         onMouseEnter={() => onMouseEnter(node.position)}
         onMouseUp={onMouseUp}
         onContextMenu={(e) => onContextMenu(e, node.position)}
