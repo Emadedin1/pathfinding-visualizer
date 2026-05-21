@@ -1,0 +1,107 @@
+.grid-container {
+  display: grid;
+  gap: 1px;
+  background-color: #e5e7eb;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.grid-node {
+  width: 100%;
+  aspect-ratio: 1;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  border: 1px solid #d1d5db;
+  border-radius: 2px;
+}
+
+.grid-node:hover {
+  opacity: 0.9;
+}
+
+/* Node types */
+.node-empty {
+  background-color: #ffffff;
+}
+
+.node-wall {
+  background-color: #1f2937;
+  border-color: #111827;
+}
+
+.node-weight {
+  background-color: #a78bfa;
+  border-color: #7c3aed;
+}
+
+.node-start {
+  background-color: #10b981;
+  border-color: #059669;
+  box-shadow: inset 0 0 0 2px #ffffff;
+}
+
+.node-target {
+  background-color: #ef4444;
+  border-color: #dc2626;
+  box-shadow: inset 0 0 0 2px #ffffff;
+}
+
+.node-visited {
+  background-color: #93c5fd;
+  border-color: #3b82f6;
+  animation: visitPulse 0.3s ease-out;
+}
+
+.node-path {
+  background-color: #fbbf24;
+  border-color: #f59e0b;
+  animation: pathPulse 0.3s ease-out;
+}
+
+@keyframes visitPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pathPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive grid sizing */
+@media (max-width: 768px) {
+  .grid-container {
+    gap: 0px;
+    padding: 4px;
+  }
+
+  .grid-node {
+    border-width: 0.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-container {
+    gap: 0px;
+    padding: 2px;
+  }
+
+  .grid-node {
+    border: none;
+  }
+}
