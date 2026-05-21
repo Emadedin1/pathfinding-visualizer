@@ -24,8 +24,8 @@
   border-radius: 18px;
   padding: 18px;
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,6 +75,7 @@
   .grid-wrapper {
     padding: 12px;
     min-height: 520px;
+    overflow-x: auto;
   }
 
   .sidebar {

@@ -56,8 +56,10 @@ const Grid: React.FC<GridProps> = ({
       onMouseLeave={handleMouseUp}
       onContextMenu={(e) => e.preventDefault()}
       style={{
-        gridTemplateColumns: `repeat(${grid[0].length}, 24px)`,
-        gridAutoRows: '24px',
+        width: '100%',
+        maxWidth: '100%',
+        gridTemplateColumns: `repeat(${grid[0].length}, minmax(0, 1fr))`,
+        gridAutoRows: 'auto',
       }}
     >
       {grid.map((row) =>
