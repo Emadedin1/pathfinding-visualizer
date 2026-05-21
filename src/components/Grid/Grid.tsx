@@ -52,23 +52,24 @@ const Grid: React.FC<GridProps> = ({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       style={{
-        gridTemplateRows: `repeat(${grid.length}, 1fr)`,
-        gridTemplateColumns: `repeat(${grid[0].length}, 1fr)`,
+        gridTemplateColumns: `repeat(${grid[0].length}, 24px)`,
+        gridAutoRows: '24px',
       }}
     >
-      {grid.map((row, rowIdx) =>
-        row.map((node, colIdx) => (
+      {grid.map((row) =>
+        row.map((node) => (
           <div
-            key={`${rowIdx}-${colIdx}`}
+            key={`${node.position.row}-${node.position.col}`}
             onMouseDown={(e) => handleMouseDown(e, node.position)}
             onMouseEnter={() => handleMouseEnter(node.position)}
             onContextMenu={(e) => onNodeContextMenu(e, node.position)}
+            style={{ width: '100%', height: '100%' }}
           >
             <GridNode
               node={node}
               onMouseDown={() => {}}
               onMouseEnter={() => {}}
-              onMouseUp={() => {}}
+              onMouseUp={handleMouseUp}
               onContextMenu={(e) => onNodeContextMenu(e, node.position)}
             />
           </div>
