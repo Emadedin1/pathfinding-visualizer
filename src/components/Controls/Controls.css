@@ -1,25 +1,22 @@
 .controls-container {
   background: linear-gradient(135deg, #f3f4f6 0%, #f9fafb 100%);
   border-radius: 12px;
-  padding: 24px;
+  padding: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 20px rgba(0, 0, 0, 0.05);
-  max-width: 300px;
   width: 100%;
-  overflow-y: auto;
-  max-height: calc(100vh - 40px);
 }
 
 .controls-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: #1f2937;
-  margin: 0 0 24px 0;
+  margin: 0 0 16px 0;
   text-align: center;
   letter-spacing: -0.5px;
 }
 
 .control-section {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .section-header {
@@ -49,7 +46,7 @@
 }
 
 .section-content {
-  padding: 12px;
+  padding: 10px;
   background: white;
   border: 1px solid #e5e7eb;
   border-top: none;
@@ -98,11 +95,10 @@
 }
 
 .algorithm-description {
-  margin-top: 8px;
+  margin: 6px 0 0 0;
   font-size: 12px;
   color: #6b7280;
   line-height: 1.4;
-  margin: 8px 0 0 0;
 }
 
 .button-group {
@@ -148,6 +144,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 4px;
 }
 
 .btn {
@@ -204,14 +201,12 @@
 /* Responsive */
 @media (max-width: 768px) {
   .controls-container {
-    max-width: 100%;
-    max-height: none;
     padding: 16px;
   }
 
   .controls-title {
-    font-size: 20px;
-    margin-bottom: 16px;
+    font-size: 18px;
+    margin-bottom: 14px;
   }
 
   .button-group {
