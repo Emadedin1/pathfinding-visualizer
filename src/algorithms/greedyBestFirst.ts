@@ -22,7 +22,7 @@ export const greedyBestFirst = (
   const visited_set = new Set<string>();
 
   // Priority queue: sorted by heuristic distance to target
-  let openSet: Position[] = [start];
+  const openSet: Position[] = [start];
 
   const heuristic = (pos: Position): number => {
     return manhattanDistance(pos, target);

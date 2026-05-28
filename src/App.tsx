@@ -99,7 +99,7 @@ const App: React.FC = () => {
     const delay = getAnimationDelay('normal');
 
     // Visualize visited nodes
-    let visualGrid = cloneGrid(gridState);
+    const visualGrid = cloneGrid(gridState);
     for (const pos of algorithmResult.visited) {
       if (visualGrid[pos.row][pos.col].type === 'empty') {
         visualGrid[pos.row][pos.col].type = 'visited';

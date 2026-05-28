@@ -24,7 +24,7 @@ export const astar = (
   const previousMap = new Map<string, Position>();
 
   // Priority queue: list of unvisited nodes sorted by fScore
-  let openSet: Position[] = [start];
+  const openSet: Position[] = [start];
 
   const heuristic = (pos: Position): number => {
     return manhattanDistance(pos, target);
