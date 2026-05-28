@@ -63,12 +63,13 @@ const App: React.FC = () => {
   const [result, setResult] = useState<AlgorithmResult | null>(null);
   const [draggingNode, setDraggingNode] = useState<'start' | 'target' | null>(null);
 
-  const visualizationRef = useRef<AbortController | null>(null);
+  const visualizationRef = useRef<{ shouldStop: boolean }>({ shouldStop: false });
 
   // Run algorithm and animate
   const runVisualization = useCallback(async () => {
     setIsVisualizing(true);
     setResult(null);
+    visualizationRef.current.shouldStop = false;
 
     // Create a copy of the current grid for algorithm
     const gridForAlgo = cloneGrid(gridState);
@@ -101,6 +102,8 @@ const App: React.FC = () => {
     // Visualize visited nodes
     const visualGrid = cloneGrid(gridState);
     for (const pos of algorithmResult.visited) {
+      if (visualizationRef.current.shouldStop) break;
+      
       if (visualGrid[pos.row][pos.col].type === 'empty') {
         visualGrid[pos.row][pos.col].type = 'visited';
       }
@@ -111,27 +114,30 @@ const App: React.FC = () => {
       }
     }
 
-    // Visualize path
-    for (const pos of algorithmResult.path) {
-      if (visualGrid[pos.row][pos.col].type !== 'start' && visualGrid[pos.row][pos.col].type !== 'target') {
-        visualGrid[pos.row][pos.col].type = 'path';
+    // Visualize path (only if not stopped)
+    if (!visualizationRef.current.shouldStop) {
+      for (const pos of algorithmResult.path) {
+        if (visualizationRef.current.shouldStop) break;
+        
+        if (visualGrid[pos.row][pos.col].type !== 'start' && visualGrid[pos.row][pos.col].type !== 'target') {
+          visualGrid[pos.row][pos.col].type = 'path';
+        }
+        setGridState(cloneGrid(visualGrid));
+        
+        if (delay > 0) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
       }
-      setGridState(cloneGrid(visualGrid));
-      
-      if (delay > 0) {
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
+
+      setResult(algorithmResult);
     }
 
-    setResult(algorithmResult);
     setIsVisualizing(false);
   }, [gridState, startPos, targetPos, selectedAlgorithm]);
 
   // Stop visualization
   const stopVisualization = useCallback(() => {
-    if (visualizationRef.current) {
-      visualizationRef.current.abort();
-    }
+    visualizationRef.current.shouldStop = true;
     setIsVisualizing(false);
   }, []);
 
@@ -276,21 +282,7 @@ const App: React.FC = () => {
     [gridState, startPos, targetPos, isVisualizing]
   );
 
-  // Clear path
-  const handleClearPath = useCallback(() => {
-    const newGrid = clearVisualization(gridState);
-    setGridState(newGrid);
-    setResult(null);
-  }, [gridState]);
-
-  // Clear walls and weights
-  const handleClearWalls = useCallback(() => {
-    const newGrid = clearWallsAndWeights(gridState);
-    setGridState(newGrid);
-    setResult(null);
-  }, [gridState]);
-
-  // Clear entire board
+  // Reset entire board
   const handleClearBoard = useCallback(() => {
     const newGrid = resetGrid(gridState.length, gridState[0].length, startPos, targetPos);
     setGridState(newGrid);
@@ -309,9 +301,6 @@ const App: React.FC = () => {
         case 'e':
           setToolMode('weight');
           break;
-        case 'c':
-          handleClearPath();
-          break;
         case 'r':
           handleClearBoard();
           break;
@@ -327,7 +316,7 @@ const App: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleClearPath, handleClearBoard, runVisualization, isVisualizing]);
+  }, [handleClearBoard, runVisualization, isVisualizing]);
 
   return (
     <div className="app">
@@ -359,9 +348,7 @@ const App: React.FC = () => {
               setTimeout(() => generateMaze(maze), 50);
             }}
             onVisualize={runVisualization}
-            onClearPath={handleClearPath}
             onClearBoard={handleClearBoard}
-            onClearWalls={handleClearWalls}
             toolMode={toolMode}
             onToolModeChange={setToolMode}
             isVisualizing={isVisualizing}

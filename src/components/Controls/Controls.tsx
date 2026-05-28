@@ -10,9 +10,7 @@ interface ControlsProps {
   onMazeChange: (maze: MazeName) => void;
   
   onVisualize: () => void;
-  onClearPath: () => void;
   onClearBoard: () => void;
-  onClearWalls: () => void;
   
   toolMode: 'wall' | 'weight';
   onToolModeChange: (mode: 'wall' | 'weight') => void;
@@ -27,9 +25,7 @@ const Controls: React.FC<ControlsProps> = ({
   selectedMaze,
   onMazeChange,
   onVisualize,
-  onClearPath,
   onClearBoard,
-  onClearWalls,
   toolMode,
   onToolModeChange,
   isVisualizing,
@@ -155,27 +151,12 @@ const Controls: React.FC<ControlsProps> = ({
             </button>
           )}
           <button
-            onClick={onClearPath}
-            disabled={isVisualizing}
-            className="btn btn-secondary"
-            title="C"
-          >
-            Clear Path
-          </button>
-          <button
-            onClick={onClearWalls}
-            disabled={isVisualizing}
-            className="btn btn-secondary"
-          >
-            Clear Walls
-          </button>
-          <button
             onClick={onClearBoard}
             disabled={isVisualizing}
             className="btn btn-secondary"
             title="R"
           >
-            Reset Board
+            🔄 Reset Board
           </button>
         </div>
       </div>
