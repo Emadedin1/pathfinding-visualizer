@@ -5,6 +5,8 @@ The app demonstrates how different pathfinding algorithms explore a grid and fin
 
 Access it here: https://pathfinding-visualizer-sage-seven.vercel.app/
 
+Demo video here: https://youtu.be/VL9tutkHUCQ
+
 ## Features
 
 - Interactive grid-based pathfinding visualization
